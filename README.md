@@ -6,7 +6,7 @@ This is the official repo for PyTorch implementation of paper "MonoPatchNeRF: Im
 
 ## Setup
 ### Prerequest
-We test our repo with a single Nvidia RTX 3090Ti. Please adjust the target batch size if GPU memory is smaller.
+We test our repo with a single Nvidia RTX 3090Ti. Please decrease the target batch size if GPU memory is smaller.
 ### Environment
 - Clone the repository locally: `git clone https://github.com/yuqunw/monopatch_nerf.git`
 - Create and activate environment: `conda create -n monopatchnerf python=3.9` and `conda activate monopatchnerf`.
@@ -56,6 +56,6 @@ python scripts/report.py --input_path "${DATA_DIR}/${scene}" \
                          --output_path "${CHECKPOINT_DIR}/${scene}/output" \
                          --gt_path "${GT_DIR}/${scene}" 
 ```
-The result is `${OUTPUT_PATH}/${scene}/results/restuls.json`, containing PSNR, SSIM, LPIPS for novel view synthesis, and F1, percision, and recall for point cloud evaluation.
+The result is `${OUTPUT_PATH}/${scene}/results/restuls.json`, containing PSNR, SSIM, LPIPS for novel view synthesis, and F1, precision, and recall for point cloud evaluation.
 
 
