@@ -130,6 +130,7 @@ def main(args):
     input_path = Path(args.input_path)
     output_path = Path(args.output_path)
     gt_path = Path(args.gt_path)
+    pc_file = output_path / 'results' / 'fused.ply'
 
     # evaluate images for test samples
     evals_images = evaluate_images(input_path, output_path)
