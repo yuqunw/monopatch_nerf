@@ -15,7 +15,7 @@ import numpy as np
 from tqdm import tqdm
 import math
 
-eth3d_evaluation_bin = Path('/home/yuqunwu2/large_scale_nerf/multi-view-evaluation/build/ETH3DMultiViewEvaluation')
+eth3d_evaluation_bin = Path('/home/yuqun/research/large_scale_nerf/multi-view-evaluation/build/ETH3DMultiViewEvaluation') # path to eth3d evaluation binary
 
 scenes = ['courtyard', 'delivery_area', 'electro', 'facade', 'kicker', 'meadow', 'office', 'pipes', 'playground', 'relief', 'relief_2', 'terrace', 'terrains']
 
@@ -23,6 +23,7 @@ def evaluate_3d(pc_file, gt_path):
     gt_file = gt_path / "dslr_scan_eval" / "scan_alignment.mlp"
     exe_str = f'{str(eth3d_evaluation_bin)} --reconstruction_ply_path {pc_file} --ground_truth_mlp_path {gt_file} --tolerances 0.02,0.05'
     output = os.popen(exe_str).read()
+    print(output)
     lines = output.split('\n')
     tolerances = [0.02, 0.05]
     com_index = [i for i, line in enumerate(lines) if line.find('Completeness') == 0][0]

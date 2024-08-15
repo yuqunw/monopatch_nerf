@@ -42,7 +42,9 @@ class DataModule:
             normal files (.png)
         transforms.json
     """
-    def __init__(self, root, batch_size=4096, num_workers=0, width=None, height=None, val_inv_scale=4, near=0, test=False, device='cpu'):
+    def __init__(self, root, batch_size=4096, num_workers=0, width=None, 
+                 height=None, val_inv_scale=4, near=0, 
+                 test=False, device='cpu'):
         super().__init__()
         self.root = Path(root)
         self.num_workers = num_workers
@@ -156,7 +158,10 @@ class DataModule:
             }
             if 'depth_path' in frame:
                 depth_file = self.root / frame["depth_path"]
-                sample['depth_file'] = depth_file           
+                sample['depth_file'] = depth_file   
+            if 'mask_file_path' in frame:
+                mask_file = self.root / frame["mask_file_path"]
+                sample['mask_file'] = mask_file
             samples.append(sample)
 
         return camera, samples 

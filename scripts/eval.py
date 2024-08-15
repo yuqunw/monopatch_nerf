@@ -17,7 +17,7 @@ import json
 import torch.nn.functional as NF
 
 def main(args):
-    datamodule = DataModule(args.data_path, device=args.device, full=args.full)
+    datamodule = DataModule(args.data_path, device=args.device, full=args.full, use_mask=args)
 
     model_ckpt = torch.load(args.model_checkpoint_file, args.device)
     model = model_ckpt['class'](**model_ckpt['arg_dict'])
@@ -47,7 +47,6 @@ def main(args):
 
     shutil.copy(Path(args.data_path) / 'transforms.json', output_path / 'transforms.json')
 
-
     datamodule.setup_test()
     dataset = datamodule.dataset
 
@@ -69,12 +68,32 @@ def main(args):
         # normals = normals.clamp(0, 1)
 
         inf_dn = NF.normalize(infs['gn'].view(*depth.shape, 3), p=2, dim=-1)
+        inf_dn[..., 1] = -inf_dn[..., 1]
+        inf_dn[..., 2] = -inf_dn[..., 2]
         inf_dn = (inf_dn + 1) / 2
         np_image = (rgb.view(H, W, 3).cpu().numpy() * 255).astype(np.uint8)
         Image.fromarray(np_image).save(output_path / 'images' / f'{i:06d}.rgb.png')
         cv2.imwrite(str(output_path / 'depths' / f'{i:06d}.depth.tiff'), scaled_depth.cpu().numpy())
         # Image.fromarray((normals.view(H, W, 3).cpu().numpy() * 255).astype(np.uint8)).save(output_path / 'normals' / f'{i:06d}.normal.png')
         Image.fromarray((inf_dn.view(H, W, 3).cpu().numpy() * 255).astype(np.uint8)).save(output_path / 'normals' / f'{i:06d}.normal.png')
+
+    # Copy the mask file
+    source_dir = Path(args.data_path)
+
+    source_scene_dir = source_dir / 'images'
+    target_scene_dir = output_path / 'images' 
+
+    for file in sorted(source_scene_dir.iterdir()):
+        if not file.is_file():
+            continue
+            
+        if file.name.startswith('dynamic_mask'):
+            file_name = file.stem.split('_')[-1]
+            if not (target_scene_dir / f'{file_name}.png').is_file():
+                continue
+            new_file = target_scene_dir / file.name
+            shutil.copy(file, new_file)
+
     print('Evaluating Done!')
 
 
@@ -89,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_path', help="Path to output")
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--full', default='True', type=eval, choices=[True, False])
+    parser.add_argument('--use_mask', default=True, type=eval, choices=[True, False], help='Whether using mask during loading images')
 
     args = parser.parse_args()
     main(args)

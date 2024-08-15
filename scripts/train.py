@@ -22,7 +22,7 @@ def main(args):
                             patch_sampling=args.patch_sampling,
                             device=args.device,
                             full=args.full,
-                            novel_translation = args.novel_translation,)
+                            use_mask = args.use_mask)
 
     model = NeuralModel(
         num_feats=args.num_feats,
@@ -120,6 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', default=16, type=int)
     parser.add_argument('--full', default='True', type=eval, choices=[True, False], help='Use all input views or 9/10 views for training')
     parser.add_argument('--cull', default='True', type=eval, choices=[True, False], help='Whether using density restriction')
+    parser.add_argument('--use_mask', default='True', type=eval, choices=[True, False], help='Whether using mask during loading images')
 
     args = parser.parse_args()
     main(args)

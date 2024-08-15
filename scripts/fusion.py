@@ -16,7 +16,7 @@ import time
 
 def main(args):
     (Path(args.output_path) / 'results').mkdir(exist_ok=True, parents=True)
-    fuse_reconstruction(Path(args.output_path), Path(args.output_path) / 'results' / 'fused.ply', args.threshold, args.min_views, args.device)
+    fuse_reconstruction(Path(args.output_path), Path(args.output_path) / 'results' / 'fused.ply', args.threshold, args.min_views, args.device,)
 
 
 def fuse_reconstruction(output_path, ply_file, threshold, min_views, device, sparse_path=None):
@@ -99,12 +99,9 @@ def fuse_reconstruction(output_path, ply_file, threshold, min_views, device, spa
     print('starting fusion...')
     start_time = time.time()
     for i in range(num_images):
-        # if i == 16:
-        #     print('here')
         pose = poses[i]
         depth = depths[i]
         image_mask = image_masks[i]
-        # project 
         norm_rays = ray.view(-1, 3) / ray.view(-1, 3)[..., 2:]
         points = norm_rays * depth.view(-1, 1)
         h_points = torch.cat((points, ones), -1)
@@ -131,14 +128,12 @@ def fuse_reconstruction(output_path, ply_file, threshold, min_views, device, spa
             baseline = ((pose[:3, 3] - src_pose[:3, 3]) ** 2).sum() ** 0.5
             f = K[0, 0]
             src_disp = f * baseline / src_proj_depths.view(-1)
-            # ref_disp = f * baseline / src_image_hpoints[:, 2:].view(-1)
             ref_disp = f * baseline / src_dists.view(-1)
             disp_mask = (ref_disp - src_disp).abs() < threshold
             grid_mask = ((src_grid_coords >= -1) & (src_grid_coords <= 1)).all(-1).view(-1)
             mask = disp_mask & grid_mask & (masks[i].view(-1) == 0) & (src_mask.view(-1) == 1)
             mask_sum += mask.float()
             mask_sum_insde_frame += (~grid_mask).float()
-        # m = (mask_sum >= min_views) | (mask_sum_insde_frame == 0) # Make sure that points not visible in any other frames are fused
         m = (mask_sum >= min_views) & (image_mask.view(-1) == 1)
 
         # iterate and assign masks
@@ -157,7 +152,6 @@ def fuse_reconstruction(output_path, ply_file, threshold, min_views, device, spa
             baseline = ((pose[:3, 3] - src_pose[:3, 3]) ** 2).sum() ** 0.5
             f = K[0, 0]
             src_disp = f * baseline / src_proj_depths.view(-1)
-            # ref_disp = f * baseline / src_image_hpoints[:, 2:].view(-1)
             ref_disp = f * baseline / src_dists.view(-1)
             disp_mask = (ref_disp - src_disp).abs() < threshold       
 
@@ -209,6 +203,7 @@ if __name__ == '__main__':
     parser.add_argument('--min_views', default=2, type=int, help="Path to output")
     parser.add_argument('--threshold', default=2.0, type=float, help="Path to output")
     parser.add_argument('--device', default='cuda')
+    parser.add_argument('--sparse_path', default=None, type=str, help="Path to sparse folder of colmap")
 
     args = parser.parse_args()
     main(args)

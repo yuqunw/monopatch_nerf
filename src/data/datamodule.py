@@ -54,7 +54,7 @@ class DataModule:
                  patch_sampling=True, 
                  device='cpu',
                  full=True,
-                 novel_translation = 0.02):
+                 use_mask=True):
         super().__init__()
         self.root = Path(root)
         self.num_workers = num_workers
@@ -67,6 +67,7 @@ class DataModule:
         self.patch_sampling = patch_sampling
         self.device = device
         self.full = full
+        self.use_mask = use_mask
         if not test:
             self.setup()
         else:
@@ -85,7 +86,7 @@ class DataModule:
             'camera': camera,
             'batch_size': self.batch_size,
             'target_batch_size': self.target_batch_size,
-            'device': self.device
+            'device': self.device,
         }
         if self.patch_sampling:
             data_args['patch_size'] = patch_size
@@ -103,7 +104,7 @@ class DataModule:
         self.camera = camera
         self.poses = [sample['pose'] for sample in train_samples]
 
-        # for validation, render first, middle and last image
+        # If not full, use 9/10 images for training, 1/10 for validation
         if not self.full:
             val_camera, val_samples = self.load_transform(self.root / 'transforms_test.json')
         else:
@@ -242,7 +243,7 @@ class DataModule:
                 normal_file = self.root / frame["normal_path"]
                 sample['normal_file'] =  normal_file
 
-            if 'mask_file_path' in frame:
+            if ('mask_file_path' in frame) and self.use_mask:
                 mask_file = self.root / frame["mask_file_path"]
                 sample['mask_file'] =  mask_file
             

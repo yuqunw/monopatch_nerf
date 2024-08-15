@@ -26,9 +26,9 @@ We test our repo with a single Nvidia RTX 3090Ti. Please decrease the target bat
 ## Usage
 ### Training
 ```
-python train.py --data_path "${DATA_DIR}/${scene}" \
-                --output_path ${OUTPUT_DIR} \
-                --experiment_name ${scene}
+python scripts/train.py --data_path "${DATA_DIR}/${scene}" \
+                --output_path "${OUTPUT_DIR}" \
+                --experiment_name "${scene}"
 ```
 The default setting uses all proposed components. Run `python train.py -h` for more options and instructions.
 
@@ -44,18 +44,36 @@ python scripts/eval.py --model_checkpoint_file "${OUTPUT_DIR}/${scene}/checkpoin
 ### Point Cloud Fusion
 Fuse point clouds with input views' poses and depths:
 ```
-python scripts/fusion.py --output_path ${OUTPUT_PATH}/${scene}/output \
-                         --sparse_path ${SPARSE_PATH}/${scene}/sparse
+python scripts/fusion.py --output_path "${OUTPUT_PATH}/${scene}/output" \
+                         --min_views 2 \
+                         --threshold 2.0
 ```
-The fused point cloud is `${OUTPUT_PATH}/${scene}/results/fused.ply`
-
-### Evaluate
-Evaluate the rendered RGB images and fused point clouds:
+The fused point cloud is `${OUTPUT_PATH}/results/fused.ply`. We use a loose threshold and views for ETH3D scenes. However, if the scene is denser, then the min_views can be larger and fusion threshold can be smaller, e.g., `--min_views=5` and `--threshold=0.5` for TnT. Can specify colmap sparse folder to accelerate the fusion for denser view, e.g., `--sparse_path ${SPARSE_DIR}/${scene}/sparse`.
+### Evaluation
+Install the point cloud [evaluation program of ETH3D](https://github.com/ETH3D/multi-view-evaluation), download the [ground truth point cloud](https://www.eth3d.net/data/multi_view_training_dslr_scan_eval.7z), change the corresponding path `eth3d_evaluation_bin` in `scripts/report.py`, and run the evaluation for rendered RGB images and fused point clouds:
 ```
 python scripts/report.py --input_path "${DATA_DIR}/${scene}" \
-                         --output_path "${CHECKPOINT_DIR}/${scene}/output" \
-                         --gt_path "${GT_DIR}/${scene}" 
+                         --output_path "${OUTPUT_PATH}/${scene}/output" \
+                         --gt_path "${GT_DIR}/${scene}/dslr_scan_eval" 
 ```
-The result is `${OUTPUT_PATH}/${scene}/results/restuls.json`, containing PSNR, SSIM, LPIPS for novel view synthesis, and F1, precision, and recall for point cloud evaluation.
+The results are in `${OUTPUT_PATH}/${scene}/output/results/restuls.json`, containing PSNR, SSIM, LPIPS for novel view synthesis, and F1, precision, and recall for point cloud evaluation.
 
-
+### Citation
+If you find this project helpful for your research, please consider citing the following BibTeX entry.
+```BibTex
+@article{wu2024monopatchnerf,
+  title={MonoPatchNeRF: Improving Neural Radiance Fields with Patch-based Monocular Guidance},
+  author={Wu, Yuqun and Lee, Jae Yong and Zou, Chuhang and Wang, Shenlong and Hoiem, Derek},
+  journal={arXiv preprint arXiv:2404.08252},
+  year={2024}
+}
+```
+If you find the QFF representation helpful for your research, please consider citing the following BibTeX entry.
+```BibTex
+@article{lee2022qff,
+  title={Qff: Quantized fourier features for neural field representations},
+  author={Lee, Jae Yong and Wu, Yuqun and Zou, Chuhang and Wang, Shenlong and Hoiem, Derek},
+  journal={arXiv preprint arXiv:2212.00914},
+  year={2022}
+}
+```
