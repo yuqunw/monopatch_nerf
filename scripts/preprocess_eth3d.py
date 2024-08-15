@@ -360,22 +360,6 @@ def main(args):
         oid += 1
 
         frames.append(frame)
-    # valid_points = np.stack([points[pid].xyz for pid in valid_pids])
-    # mins = valid_points.min(0)
-    # maxs = valid_points.max(0)
-    # center = (maxs + mins) / 2.0
-    # scale = (maxs - mins).max() / 1.8
-
-
-    # for oid, frame in tqdm(enumerate(frames), leave=False, desc='Transforming', dynamic_ncols=True):
-    #     p = np.array(frame['transform_matrix'])
-    #     depth = cv2.imread( str(output_path / frame['depth_path']), cv2.IMREAD_UNCHANGED)
-    #     p[:3, 3] -= center
-    #     p[:3, 3] /= scale
-    #     depth = depth / scale
-    #     cv2.imwrite( str(output_path / frame['depth_path']), depth)
-
-        # frame['transform_matrix'] = p.tolist()
 
     transforms_data['pose_scale'] = scale
     transforms_data['pose_offset'] = center.tolist()
@@ -402,6 +386,7 @@ def main(args):
 
     with open(output_path / 'transforms_test.json', 'w') as f:
         json.dump(test_transforms_data, f, indent=4)
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()

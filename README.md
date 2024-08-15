@@ -4,6 +4,11 @@ This is the official repo for PyTorch implementation of paper "MonoPatchNeRF: Im
 
 ### [Paper](https://arxiv.org/abs/2404.08252) | [Project](https://yuqunw.github.io/MonoPatchNeRF/)
 
+
+<video width="640" height="360" controls>
+    <source src="video.mp4" type="video/mp4">
+</video>
+
 ## Setup
 ### Prerequest
 We test our repo with a single Nvidia RTX 3090Ti. Please decrease the target batch size if GPU memory is smaller.
