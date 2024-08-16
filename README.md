@@ -4,11 +4,6 @@ This is the official repo for PyTorch implementation of paper "MonoPatchNeRF: Im
 
 ### [Paper](https://arxiv.org/abs/2404.08252) | [Project](https://yuqunw.github.io/MonoPatchNeRF/)
 
-
-<video width="640" height="360" controls>
-    <source src="video.mp4" type="video/mp4">
-</video>
-
 ## Setup
 ### Prerequest
 We test our repo with a single Nvidia RTX 3090Ti. Please decrease the target batch size if GPU memory is smaller.
@@ -53,7 +48,7 @@ python scripts/fusion.py --output_path "${OUTPUT_PATH}/${scene}/output" \
                          --min_views 2 \
                          --threshold 2.0
 ```
-The fused point cloud is `${OUTPUT_PATH}/results/fused.ply`. We use a loose threshold and views for ETH3D scenes. However, if the scene is denser, then the min_views can be larger and fusion threshold can be smaller, e.g., `--min_views=5` and `--threshold=0.5` for TnT. Can specify colmap sparse folder to accelerate the fusion for denser view, e.g., `--sparse_path ${SPARSE_DIR}/${scene}/sparse`.
+The fused point cloud is `${OUTPUT_PATH}/results/fused.ply`. We use a loose threshold and views for ETH3D scenes. However, if the scene is denser, then the min_views can be larger and fusion threshold can be smaller, e.g., `--min_views=5` and `--threshold=0.5` for Tanks and Temples scenes. Colmap sparse folder can be specified to accelerate the fusion for denser view, e.g., `--sparse_path ${SPARSE_DIR}/${scene}/sparse`.
 ### Evaluation
 Install the point cloud [evaluation program of ETH3D](https://github.com/ETH3D/multi-view-evaluation), download the [ground truth point cloud](https://www.eth3d.net/data/multi_view_training_dslr_scan_eval.7z), change the corresponding path `eth3d_evaluation_bin` in `scripts/report.py`, and run the evaluation for rendered RGB images and fused point clouds:
 ```
